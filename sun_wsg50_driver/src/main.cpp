@@ -293,7 +293,7 @@ void timer_cb(const ros::TimerEvent& ev)
             res = script_measure_move(1, g_goal_position, g_speed, info);
 		} else if (!isnan(g_goal_speed)) {
 			//printf("NOT NAN GOAL SPEED\n");
-			ROS_INFO("Velocity command: speed=%5.1f", g_goal_speed);
+			//ROS_INFO("Velocity command: speed=%5.1f", g_goal_speed);
             		res = script_measure_move(2, 0, g_goal_speed, info);
 		} else{
 			myTime = ros::Time::now(); //last point in the code where i can call ros:Time:now();
@@ -581,6 +581,8 @@ int main( int argc, char **argv )
    nh.param("goal_speed_topic", goal_speed_topic_str, string("goal_speed"));
    string status_topic_str("");
    nh.param("status_topic", status_topic_str, string("status"));
+   string homing_srv_str("");
+   nh.param("homing_srv", homing_srv_str, string("homing"));
 
    if (protocol == "udp")
        use_udp = true;
@@ -614,7 +616,7 @@ int main( int argc, char **argv )
             moveSS = nh_public.advertiseService("move", moveSrv);
             graspSS = nh_public.advertiseService("grasp", graspSrv);
             releaseSS = nh_public.advertiseService("release", releaseSrv);
-            homingSS = nh_public.advertiseService("homing", homingSrv);
+            homingSS = nh_public.advertiseService(homing_srv_str, homingSrv);
             stopSS = nh_public.advertiseService("stop", stopSrv);
             ackSS = nh_public.advertiseService("ack", ackSrv);
             incrementSS = nh_public.advertiseService("move_incrementally", incrementSrv);
