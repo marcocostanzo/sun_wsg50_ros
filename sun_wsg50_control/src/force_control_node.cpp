@@ -168,7 +168,7 @@ int main(int argc, char *argv[]){
     nh_private.param("topic_measure" , topic_measure_str, string("grasp_force") );
     nh_private.param("topic_measure_type" , topic_measure_type_str, string("Float64") );
     
-    nh_private.param("topic_force_command" , topic_force_command_str, string("commandForce") );
+    nh_private.param("topic_force_command" , topic_force_command_str, string("command_force") );
 	string topic_goal_speed("");
     nh_private.param("topic_goal_speed" , topic_goal_speed, string("goal_speed") );
 
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]){
     nh_private.param("pause_service" , pause_service, string("pause") );
     nh_private.param("start_in_pause" , paused, false );
 
-    nh_private.param("controlGain" , control_gain, (float)1.0 );
+    nh_private.param("control_gain" , control_gain, (float)1.0 );
     nh_private.param("max_force" , max_force, (float)20.0 );
 
 	 // Publisher
