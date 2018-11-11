@@ -1,0 +1,79 @@
+<launch>
+
+	<arg name="gripper_ip" default="192.168.2.110" />
+	<arg name="gripper_port" default="1000" />
+	<arg name="local_port" default="1501" />
+
+	<arg name="goal_speed_topic" default="goal_speed" />
+	<arg name="status_topic" default="status" />
+	<arg name="homing_srv" default="homing" />
+
+	<arg name="gripper_model" default="wsg50" />
+
+
+	<arg name="measure_topic" default="grasp_force" />
+	<arg name="measure_topic_type" default="Float64" />
+
+	<arg name="force_command_topic" default="command_force" />
+	<arg name="topic_goal_speed" default="goal_speed" />
+
+	<arg name="pause_service" default="pause" />
+	<arg name="start_in_pause" default="true" />
+
+	<arg name="control_gain" default="1.4" />
+	<arg name="max_force" default="20.0" />
+
+	<arg name="filter_control" default="true" />
+	<arg name="cut_freq" default="40.0" />
+	<arg name="rate" default="200.0" />
+
+
+	<include file="$(find sun_wsg50_driver)/launch/wsg50_tcp_script.launch">
+
+		<arg name="gripper_ip" value="$(arg gripper_ip)" />
+		<arg name="gripper_port" value="$(arg gripper_port)" />
+		<arg name="local_port" value="$(arg local_port)" />
+
+		<arg name="goal_speed_topic" value="$(arg goal_speed_topic)" />
+		<arg name="status_topic" value="$(arg status_topic)" />
+		<arg name="homing_srv" value="$(arg homing_srv)" />
+
+		<arg name="gripper_model" value="$(arg gripper_model)" />
+   
+	</include>
+	
+
+	<node name="force_control"  pkg="sun_wsg50_control" type="force_control" output="screen">
+
+		<param name="topic_measure" type="string" value="$(arg measure_topic)" />
+		<param name="topic_measure_type" type="string" value="$(arg measure_topic_type)" />
+
+		<param name="topic_force_command" type="string" value="$(arg force_command_topic)" />
+
+		<param name="topic_goal_speed" type="string" value="$(arg topic_goal_speed)/raw" if="$(arg filter_control)"/>
+		<param name="topic_goal_speed" type="string" value="$(arg topic_goal_speed)" unless="$(arg filter_control)"/>
+
+		<param name="pause_service" type="string" value="$(arg pause_service)"/>
+
+		<param name="start_in_pause" type="bool" value="$(arg start_in_pause)"/>
+
+		<param name="control_gain" value="$(arg control_gain)"/>
+
+		<param name="max_force" value="$(arg max_force)"/>
+
+	</node>
+
+
+	<node name="filter_control" pkg="sun_utils" type="filter_float32" if="$(arg filter_control)" output="screen">
+
+		<param name="in_topic" type="string" value="$(arg topic_goal_speed)/raw" />
+
+		<param name="out_topic" type="string" value="$(arg topic_goal_speed)"/>
+
+		<param name="cut_freq" value="$(arg cut_freq)"/>
+
+		<param name="rate" value="$(arg rate)"/>
+
+	</node>
+
+</launch>

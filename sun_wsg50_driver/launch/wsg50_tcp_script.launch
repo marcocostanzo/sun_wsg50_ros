@@ -1,0 +1,37 @@
+<launch>
+  
+
+  <arg name="gripper_ip" default="192.168.2.110" />
+  <arg name="gripper_port" default="1000" />
+  <arg name="local_port" default="1501" />
+
+  <arg name="goal_speed_topic" default="goal_speed" />
+  <arg name="status_topic" default="status" />
+  <arg name="homing_srv" default="homing" />
+
+  <arg name="gripper_model" default="wsg50" />
+
+  <arg name="dollar" value="$" />
+  <arg name="com_mode" value="script" /> <!-- or  auto_update, polling -->
+  <arg name="protocol" value="tcp" />
+
+
+  <node  name="$(arg gripper_model)_driver_sun"  pkg="sun_wsg50_driver" type="wsg_50_ip_sun" required="true">
+
+    <param name="ip" type="string" value="$(arg gripper_ip)"/> <!--Remember to set the ip address-->
+    <!--<param name="ip" type="string" command="dig +short $(arg gripperIP)"/> --><!--Remember to set the ip address-->
+    <param name="port" type="int" value="$(arg gripper_port)"/>
+    <param name="local_port" type="int" value="$(arg local_port)"/>
+    <param name="protocol" type="string" value="$(arg protocol)"/>
+    <param name="com_mode" type="string" value="$(arg com_mode)"/>
+    <param name="rate" type="double" value="50"/> <!-- WSG50 HW revision 2: up to 30 Hz with script; 140Hz with auto_update -->
+    <param name="grasping_force" type="double" value="500"/>
+
+    <param name="goal_speed_topic" type="string" value="$(arg goal_speed_topic)"/>
+    <param name="status_topic" type="string" value="$(arg status_topic)"/>
+    <param name="homing_srv" type="string" value="$(arg homing_srv)"/>
+
+  </node>
+
+</launch>
+
