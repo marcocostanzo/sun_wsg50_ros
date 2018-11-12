@@ -332,7 +332,7 @@ void timer_cb(const ros::TimerEvent& ev)
 	status_msg.force_finger1 = info.f_finger1;
 
     std_msgs::Float64 distance_msg;
-    distance_msg.data = info.position;
+    distance_msg.data = info.position/1000.0; //[mm] to [m]
     g_pub_distnce.publish(distance_msg);
 
 	g_pub_state.publish(status_msg);
