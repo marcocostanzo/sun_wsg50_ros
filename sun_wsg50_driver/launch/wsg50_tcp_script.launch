@@ -8,13 +8,13 @@
   <arg name="goal_speed_topic" default="goal_speed" />
   <arg name="status_topic" default="status" />
   <arg name="homing_srv" default="homing" />
+  <arg name="width_topic" default="width" />
 
   <arg name="gripper_model" default="wsg50" />
 
   <arg name="dollar" value="$" />
   <arg name="com_mode" value="script" /> <!-- or  auto_update, polling -->
   <arg name="protocol" value="tcp" />
-
 
   <node  name="$(arg gripper_model)_driver_sun"  pkg="sun_wsg50_driver" type="wsg_50_ip_sun" required="true">
 
@@ -30,6 +30,8 @@
     <param name="goal_speed_topic" type="string" value="$(arg goal_speed_topic)"/>
     <param name="status_topic" type="string" value="$(arg status_topic)"/>
     <param name="homing_srv" type="string" value="$(arg homing_srv)"/>
+
+    <param name="width_topic" type="string" value="$(arg width_topic)"/>
 
   </node>
 

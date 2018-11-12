@@ -63,6 +63,7 @@
 
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/Float32.h"
+#include "std_msgs/Float64.h"
 //#include "sun_wsg50_common/Tactile.h"
 #include "std_msgs/Bool.h"
 
@@ -89,7 +90,7 @@ float increment;
 bool objectGraspped;
 
 int g_timer_cnt = 0;
-ros::Publisher g_pub_state, g_pub_joint, g_pub_moving;//, pub_tact0, pub_tact1;
+ros::Publisher g_pub_state, g_pub_joint, g_pub_moving, g_pub_distnce;//, pub_tact0, pub_tact1;
 bool g_ismoving = false, g_mode_script = false, g_mode_periodic = false, g_mode_polling = false;
 float g_goal_position = NAN, g_goal_speed = NAN, g_speed = 10.0;
    
@@ -329,6 +330,10 @@ void timer_cb(const ros::TimerEvent& ev)
 	status_msg.force = info.f_motor;
 	status_msg.force_finger0 = info.f_finger0;
 	status_msg.force_finger1 = info.f_finger1;
+
+    std_msgs::Float64 distance_msg;
+    distance_msg.data = info.position;
+    g_pub_distnce.publish(distance_msg);
 
 	g_pub_state.publish(status_msg);
              
@@ -583,6 +588,8 @@ int main( int argc, char **argv )
    nh.param("status_topic", status_topic_str, string("status"));
    string homing_srv_str("");
    nh.param("homing_srv", homing_srv_str, string("homing"));
+   string finger_distance_topic_str("");
+   nh.param("width_topic", finger_distance_topic_str, string("width"));
 
    if (protocol == "udp")
        use_udp = true;
@@ -637,6 +644,7 @@ int main( int argc, char **argv )
 		// Publisher
 		g_pub_state = nh_public.advertise<sun_wsg50_common::Status>(status_topic_str, 1);
 		g_pub_joint = nh_public.advertise<sensor_msgs::JointState>("/wsg_50_driver/joint_states", 10);
+        g_pub_distnce = nh_public.advertise<std_msgs::Float64>(finger_distance_topic_str, 1);
         if (g_mode_script || g_mode_periodic)
             g_pub_moving = nh_public.advertise<std_msgs::Bool>("moving", 10);
 
