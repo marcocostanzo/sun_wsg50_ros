@@ -379,7 +379,7 @@ int script_measure_move (unsigned char cmd_type, float cmd_width, float cmd_spee
 //printf("SCRIPT_MEASURE - try01\n");
 		info.position = convert(&resp[off]);     off+=4;
 //printf("SCRIPT_MEASURE - try01\n");
-		info.speed = 0.0;//convert(&resp[off]);        off+=4;
+		info.speed = convert(&resp[off]);        off+=4;
 		info.f_motor = 0.0;//convert(&resp[off]);      off+=4;
 //printf("SCRIPT_MEASURE - try01\n");
 

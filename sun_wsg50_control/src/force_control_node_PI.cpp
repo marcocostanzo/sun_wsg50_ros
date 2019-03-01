@@ -26,6 +26,8 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/Float32.h>
 #include "std_srvs/SetBool.h"
+#include <TF_SISO/TF_INTEGRATOR.h>
+#include <TF_SISO/TF_FIRST_ORDER_FILTER.h>
 
 /* ======= COLORS ========= */
 #define CRESET   "\033[0m"
@@ -46,9 +48,10 @@ constexpr unsigned int str2int(const char* str, int h = 0)
     return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
 }
 
+TF_INTEGRATOR * tf_integrator;
 
 ros::NodeHandle * nh_public;
-ros::Publisher velPub;
+ros::Publisher out_pub;
 ros::Subscriber force_sub;
 ros::Subscriber force_command_sub;
 
@@ -58,34 +61,22 @@ string topic_measure_type_str("");
 
 double fz = 0.0;
 double fr = 0.0;
-float max_force = 20.0;
-float control_gain = 1.0;
+double max_force = 20.0;
 std_msgs::Float32 velMsg;
-
-void applyControl(){
-    //velMsg.data = -control_gain*(fr-fabs(fz));
-    double dx = sqrt( fabs(fz) / 5.0839 );
-    double dx_r = sqrt( fabs(fr) / 5.0839 );
-    velMsg.data = -control_gain*(dx_r-dx);
-    velPub.publish(velMsg);
-}
 
 void readForceWrenchStamped(const geometry_msgs::WrenchStamped::ConstPtr& forceMsg){
 	fz = forceMsg->wrench.force.z;
-	applyControl();
 }
 void readForceWrench(const geometry_msgs::Wrench::ConstPtr& forceMsg){
 	fz = forceMsg->force.z;
-	applyControl();
 }
 void readForceFloat64(const std_msgs::Float64::ConstPtr& forceMsg){
 	fz = forceMsg->data;
-	applyControl();
 }
 
 void readCommand(const std_msgs::Float64::ConstPtr& forceMsg){
 
-	fr = fabs(forceMsg->data);
+	fr = forceMsg->data;
     //saturation
     if(fr>max_force){
         fr = max_force;
@@ -93,13 +84,6 @@ void readCommand(const std_msgs::Float64::ConstPtr& forceMsg){
     }
 }
 
-void sendZeroVel(){
-    velMsg.data = 0.0;
-    velPub.publish(velMsg);
-    velPub.publish(velMsg);
-    velPub.publish(velMsg);
-    velPub.publish(velMsg);
-}
 void stopSubscribers(){
     force_sub.shutdown();
     force_command_sub.shutdown();
@@ -136,14 +120,14 @@ bool pause_callbk(std_srvs::SetBool::Request  &req,
    		 		std_srvs::SetBool::Response &res){
 
 	if(req.data){
-
+        tf_integrator->reset();
         stopSubscribers();
-        sendZeroVel();
 		cout << HEADER_PRINT YELLOW "PAUSED!" CRESET << endl;
         paused = true;
 
 	} else{
         if(paused){
+            tf_integrator->reset();
             startSubscribers();
 		    cout << HEADER_PRINT GREEN "STARTED!" CRESET << endl;
         }
@@ -152,12 +136,6 @@ bool pause_callbk(std_srvs::SetBool::Request  &req,
 
     res.success = true;
 	return true;
-}
-
-
-void intHandler(int dummy) {
-    sendZeroVel();
-    ros::shutdown();
 }
 
 
@@ -172,32 +150,59 @@ int main(int argc, char *argv[]){
     nh_private.param("topic_measure_type" , topic_measure_type_str, string("Float64") );
     
     nh_private.param("topic_force_command" , topic_force_command_str, string("command_force") );
-	string topic_goal_speed("");
-    nh_private.param("topic_goal_speed" , topic_goal_speed, string("goal_speed") );
+	string topic_out("");
+    nh_private.param("topic_out" , topic_out, string("position_cmd") );
 
     string pause_service("");
     nh_private.param("pause_service" , pause_service, string("pause") );
     nh_private.param("start_in_pause" , paused, false );
 
-    nh_private.param("control_gain" , control_gain, (float)1.0 );
-    nh_private.param("max_force" , max_force, (float)20.0 );
+    double i_gain, p_gain;
+    nh_private.param("p_gain" , p_gain, 1.0 );
+    nh_private.param("i_gain" , i_gain, 1.0 );
+    nh_private.param("max_force" , max_force, 20.0 );
+    double Hz;
+    nh_private.param("rate" , Hz, 200.0 );
+
+
 
 	 // Publisher
      if(!paused){
         startSubscribers();
      }
-	 velPub = nh_public->advertise<std_msgs::Float32>( topic_goal_speed,1);
+	 out_pub = nh_public->advertise<std_msgs::Float32>( topic_out,1);
+
+     tf_integrator = new TF_INTEGRATOR(1.0/Hz, i_gain);
 
     ros::ServiceServer servicePause = nh_public->advertiseService(pause_service, pause_callbk);
 
-    control_gain = fabs(control_gain);
-    max_force = fabs(max_force);
+    ros::Rate loop_rate(Hz);
+    std_msgs::Float32 out_msg;
+    TF_FIRST_ORDER_FILTER tf_filter = TF_FIRST_ORDER_FILTER(5.3, 1.0/Hz);
+    while (ros::ok())
+    {
+        
+        ros::spinOnce();
+        if(paused){
+            loop_rate.sleep();
+            continue;
+        }
 
-    signal(SIGINT, intHandler);
+        //Apply control
+        double error_force = -fr+fz;
+        //out_msg.data = tf_integrator->apply(error_force) + p_gain * error_force ; 
+        out_msg.data = tf_filter.apply(fr*9.0);
 
-    ros::spin();
+        cout << "ERROR = " << error_force << endl;
+            
+        out_pub.publish(out_msg);
 
-	sendZeroVel();
+        loop_rate.sleep();
+
+
+
+    }
+    
 
     return 0;
 }
