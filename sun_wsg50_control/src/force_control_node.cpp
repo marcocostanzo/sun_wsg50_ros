@@ -58,15 +58,26 @@ string topic_measure_type_str("");
 
 double fz = 0.0;
 double fr = 0.0;
-float max_force = 20.0;
-float control_gain = 1.0;
+float max_force;
+float control_gain;
+double stiff_1;
+double stiff_2;
+bool b_linear_model;
 std_msgs::Float32 velMsg;
 
+double inv_stiff(double f){
+    if(b_linear_model){
+        return f/stiff_1;
+    } else{
+        sqrt( fabs(f)/stiff_2 );
+    }
+}
+
 void applyControl(){
-    //velMsg.data = -control_gain*(fr-fabs(fz));
-    double dx = sqrt( fabs(fz) / 5.0839 );
-    double dx_r = sqrt( fabs(fr) / 5.0839 );
-    velMsg.data = -control_gain*(dx_r-dx);
+    double dx = inv_stiff(fz);
+    double dx_r = inv_stiff(fr);
+    velMsg.data = -control_gain*(dx_r-fabs(dx));
+    velMsg.data = velMsg.data*1.0E3; // m/s  to mm/s
     velPub.publish(velMsg);
 }
 
@@ -100,10 +111,12 @@ void sendZeroVel(){
     velPub.publish(velMsg);
     velPub.publish(velMsg);
 }
+
 void stopSubscribers(){
     force_sub.shutdown();
     force_command_sub.shutdown();
 }
+
 void startSubscribers(){
     switch (str2int(topic_measure_type_str.c_str()))
     {
@@ -131,23 +144,23 @@ void startSubscribers(){
 }
 
 /*Pause callback*/
-bool paused = true;
-bool pause_callbk(std_srvs::SetBool::Request  &req, 
+bool running = true;
+bool setRunning_callbk(std_srvs::SetBool::Request  &req, 
    		 		std_srvs::SetBool::Response &res){
 
-	if(req.data){
+    if(req.data){
 
-        stopSubscribers();
-        sendZeroVel();
-		cout << HEADER_PRINT YELLOW "PAUSED!" CRESET << endl;
-        paused = true;
-
-	} else{
-        if(paused){
+        if(!running){
             startSubscribers();
 		    cout << HEADER_PRINT GREEN "STARTED!" CRESET << endl;
         }
-        paused = false;
+        running = true;
+
+	} else{
+        stopSubscribers();
+        sendZeroVel();
+        running = false;
+		cout << HEADER_PRINT YELLOW "PAUSED!" CRESET << endl;  
     }
 
     res.success = true;
@@ -175,23 +188,31 @@ int main(int argc, char *argv[]){
 	string topic_goal_speed("");
     nh_private.param("topic_goal_speed" , topic_goal_speed, string("goal_speed") );
 
-    string pause_service("");
-    nh_private.param("pause_service" , pause_service, string("pause") );
-    nh_private.param("start_in_pause" , paused, false );
+    string set_running_service_str("");
+    nh_private.param("set_running_service" , set_running_service_str, string("set_running") );
+    nh_private.param("start_running" , running, false );
 
     nh_private.param("control_gain" , control_gain, (float)1.0 );
     nh_private.param("max_force" , max_force, (float)20.0 );
+    nh_private.param("stiff_1" , stiff_1, 5000.0 );
+    nh_private.param("stiff_2" , stiff_2, 5.0839*1.0E6 );
+    nh_private.param("use_linear_model" , b_linear_model, false );
 
 	 // Publisher
-     if(!paused){
+     if(running){
         startSubscribers();
      }
 	 velPub = nh_public->advertise<std_msgs::Float32>( topic_goal_speed,1);
 
-    ros::ServiceServer servicePause = nh_public->advertiseService(pause_service, pause_callbk);
+    ros::ServiceServer servicePause = nh_public->advertiseService(set_running_service_str, setRunning_callbk);
 
     control_gain = fabs(control_gain);
     max_force = fabs(max_force);
+
+    if(stiff_1 <= 0 || stiff_2 <= 0){
+        cout << HEADER_PRINT BOLDRED "Both stiff have to be > 0 | Fatal ERROR" CRESET << endl;
+        exit(-1); 
+    }
 
     signal(SIGINT, intHandler);
 
