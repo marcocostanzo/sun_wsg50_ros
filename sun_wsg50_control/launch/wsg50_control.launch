@@ -17,11 +17,15 @@
 	<arg name="force_command_topic" default="command_force" />
 	<arg name="width_topic" default="width" />
 
-	<arg name="pause_service" default="pause" />
-	<arg name="start_in_pause" default="true" />
+	<arg name="force_control_set_running_service" default="set_running" />
+	<arg name="force_control_start_running" default="false" />
 
 	<arg name="control_gain" default="1.4" />
 	<arg name="max_force" default="20.0" />
+
+	<arg name="stiff_1" default="5000.0"/>
+	<arg name="stiff_2" default="5.0839E6"/>
+	<arg name="use_linear_model" default="false"/>
 
 	<arg name="filter_control" default="true" />
 	<arg name="cut_freq" default="40.0" />
@@ -54,13 +58,17 @@
 		<param name="topic_goal_speed" type="string" value="$(arg goal_speed_topic)/raw" if="$(arg filter_control)"/>
 		<param name="topic_goal_speed" type="string" value="$(arg goal_speed_topic)" unless="$(arg filter_control)"/>
 
-		<param name="pause_service" type="string" value="$(arg pause_service)"/>
+		<param name="set_running_service" type="string" value="$(arg force_control_set_running_service)"/>
 
-		<param name="start_in_pause" type="bool" value="$(arg start_in_pause)"/>
+		<param name="start_running" type="bool" value="$(arg force_control_start_running)"/>
 
 		<param name="control_gain" value="$(arg control_gain)"/>
 
 		<param name="max_force" value="$(arg max_force)"/>
+
+		<param name="stiff_1" value="$(arg stiff_1)"/>
+		<param name="stiff_2" value="$(arg stiff_2)"/>
+		<param name="use_linear_model" value="$(arg use_linear_model)"/>
 
 	</node>
 
