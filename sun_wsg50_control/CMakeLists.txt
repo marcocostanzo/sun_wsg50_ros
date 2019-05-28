@@ -224,3 +224,11 @@ add_dependencies(force_control_PI ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_E
 target_link_libraries(force_control_PI
   ${catkin_LIBRARIES}
 )
+####################################
+add_executable(status_monitoring
+  src/status_monitoring_node.cpp
+)
+add_dependencies(status_monitoring ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(status_monitoring
+  ${catkin_LIBRARIES}
+)

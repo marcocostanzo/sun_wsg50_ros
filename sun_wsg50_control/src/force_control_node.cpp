@@ -1,7 +1,7 @@
 /*
     ROS node to control the normal force
 
-    Copyright 2018 Università della Campania Luigi Vanvitelli
+    Copyright 2018-2019 Università della Campania Luigi Vanvitelli
 
     Author: Marco Costanzo <marco.costanzo@unicampania.it>
 
@@ -219,6 +219,8 @@ int main(int argc, char *argv[]){
     ros::spin();
 
 	sendZeroVel();
+
+    delete nh_public;
 
     return 0;
 }
