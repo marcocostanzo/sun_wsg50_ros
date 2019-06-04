@@ -10,7 +10,6 @@ project(sun_wsg50_control)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sun_wsg50_common
-  sun_systems_lib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -206,22 +205,6 @@ add_executable(force_control
 )
 add_dependencies(force_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(force_control
-  ${catkin_LIBRARIES}
-)
-####################################
-add_executable(position_control
-  src/position_control_lode.cpp
-)
-add_dependencies(position_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(position_control
-  ${catkin_LIBRARIES}
-)
-####################################
-add_executable(force_control_PI
-  src/force_control_node_PI.cpp
-)
-add_dependencies(force_control_PI ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(force_control_PI
   ${catkin_LIBRARIES}
 )
 ####################################
