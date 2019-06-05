@@ -47,6 +47,13 @@ void monitor_cb(const std_msgs::Float32::ConstPtr& speed_in)
         speed_out.data = speed_in->data;
     }
 
+    //Check invalid inputs
+    if( isinf(speed_out.data) || isnan(speed_out.data) )
+    {
+        ROS_ERROR_THROTTLE( 0.5 ,"GRIPPER MONITORING: INF OR NAN: %lf", speed_out.data );
+        speed_out.data = 0.0;
+    }
+
     pub_speed.publish(speed_out);
 
 }

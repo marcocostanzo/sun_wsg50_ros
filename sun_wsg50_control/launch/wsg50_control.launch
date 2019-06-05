@@ -32,7 +32,7 @@
 	<arg name="rate" default="1000.0" />
 
 	<!-- for status monitoring in [m] -->
-	<arg name="width_min" default="0.020"/>
+	<arg name="width_min" default="0.050"/>
 	<arg name="width_max" default="0.108"/>
 
 
@@ -95,7 +95,7 @@
 		<param name="width_max" value="$(arg width_max)"/>
 
 		<param name="topic_goal_speed_in" type="string" value="$(arg goal_speed_topic)/unmonitored" />
-		<param name="topic_goal_speed_out" type="string" value="$(arg goal_speed_topic)"/>
+		<param name="topic_goal_speed_out" type="string" value="$(arg goal_speed_topic)/fake"/>
 		<param name="topic_width" type="string" value="$(arg width_topic)"/>
 
 	</node>

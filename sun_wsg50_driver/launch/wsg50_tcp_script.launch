@@ -16,7 +16,7 @@
   <arg name="com_mode" value="script" /> <!-- or  auto_update, polling -->
   <arg name="protocol" value="tcp" />
 
-  <node  name="$(arg gripper_model)_driver_sun"  pkg="sun_wsg50_driver" type="wsg_50_ip_sun" required="true">
+  <node  name="$(arg gripper_model)_driver_sun"  pkg="sun_wsg50_driver" type="wsg_50_ip_sun" >
 
     <param name="ip" type="string" value="$(arg gripper_ip)"/> <!--Remember to set the ip address-->
     <!--<param name="ip" type="string" command="dig +short $(arg gripperIP)"/> --><!--Remember to set the ip address-->

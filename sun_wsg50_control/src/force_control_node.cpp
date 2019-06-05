@@ -58,8 +58,8 @@ string topic_measure_type_str("");
 
 double fz = 0.0;
 double fr = 0.0;
-float max_force;
-float control_gain;
+double max_force;
+double control_gain;
 double stiff_1;
 double stiff_2;
 bool b_linear_model;
@@ -69,7 +69,7 @@ double inv_stiff(double f){
     if(b_linear_model){
         return f/stiff_1;
     } else{
-        sqrt( fabs(f)/stiff_2 );
+        return sqrt( fabs(f)/stiff_2 );
     }
 }
 
@@ -192,8 +192,8 @@ int main(int argc, char *argv[]){
     nh_private.param("set_running_service" , set_running_service_str, string("set_running") );
     nh_private.param("start_running" , running, false );
 
-    nh_private.param("control_gain" , control_gain, (float)1.0 );
-    nh_private.param("max_force" , max_force, (float)20.0 );
+    nh_private.param("control_gain" , control_gain, 1.0 );
+    nh_private.param("max_force" , max_force, 20.0 );
     nh_private.param("stiff_1" , stiff_1, 5000.0 );
     nh_private.param("stiff_2" , stiff_2, 5.0839*1.0E6 );
     nh_private.param("use_linear_model" , b_linear_model, false );
