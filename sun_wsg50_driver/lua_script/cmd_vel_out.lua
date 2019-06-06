@@ -70,7 +70,7 @@ print("KD");
 print(kd);
 printf("-----------------------\n");
 
-mc.pid( 0.1, ki, kd );
+--mc.pid( 0.1, ki, kd );
 
 printf("====NEW VEL PID GAINS====\n");
 kp,ki,kd=mc.pid();
