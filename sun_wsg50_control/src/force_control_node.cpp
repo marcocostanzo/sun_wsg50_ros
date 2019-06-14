@@ -112,6 +112,7 @@ void readCommand(const sun_ros_msgs::Float64Stamped::ConstPtr& forceMsg){
 
 void sendZeroVel(){
     velMsg.data = 0.0;
+    velMsg.header.stamp = ros::Time::now();
     velPub.publish(velMsg);
     velPub.publish(velMsg);
     velPub.publish(velMsg);
