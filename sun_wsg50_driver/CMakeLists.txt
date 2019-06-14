@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   std_srvs
   sun_wsg50_common
+  sun_ros_msgs
 )
 
 catkin_package(

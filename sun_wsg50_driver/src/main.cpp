@@ -62,8 +62,8 @@
 #include "sun_wsg50_common/Cmd.h"
 
 #include "sensor_msgs/JointState.h"
-#include "std_msgs/Float32.h"
-#include "std_msgs/Float64.h"
+//#include "std_msgs/Float32.h"
+#include "sun_ros_msgs/Float64Stamped.h"
 //#include "sun_wsg50_common/Tactile.h"
 #include "std_msgs/Bool.h"
 
@@ -257,7 +257,7 @@ void position_cb(const sun_wsg50_common::Cmd::ConstPtr& msg)
 }
 
 /** \brief Callback for goal_speed topic (in appropriate modes) */
-void speed_cb(const std_msgs::Float32::ConstPtr& msg)
+void speed_cb(const sun_ros_msgs::Float64Stamped::ConstPtr& msg)
 {
     g_goal_speed = msg->data; g_speed = msg->data;
     // timer_cb() will send command to gripper
@@ -331,7 +331,8 @@ void timer_cb(const ros::TimerEvent& ev)
 	status_msg.force_finger0 = info.f_finger0;
 	status_msg.force_finger1 = info.f_finger1;
 
-    std_msgs::Float64 distance_msg;
+    sun_ros_msgs::Float64Stamped distance_msg;
+    distance_msg.header.stamp = ros::Time::now();
     distance_msg.data = info.position/1000.0; //[mm] to [m]
     g_pub_distnce.publish(distance_msg);
 
@@ -644,7 +645,7 @@ int main( int argc, char **argv )
 		// Publisher
 		g_pub_state = nh_public.advertise<sun_wsg50_common::Status>(status_topic_str, 1);
 		g_pub_joint = nh_public.advertise<sensor_msgs::JointState>("/wsg_50_driver/joint_states", 10);
-        g_pub_distnce = nh_public.advertise<std_msgs::Float64>(finger_distance_topic_str, 1);
+        g_pub_distnce = nh_public.advertise<sun_ros_msgs::Float64Stamped>(finger_distance_topic_str, 1);
         if (g_mode_script || g_mode_periodic)
             g_pub_moving = nh_public.advertise<std_msgs::Bool>("moving", 10);
 

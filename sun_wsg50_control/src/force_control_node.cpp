@@ -25,6 +25,7 @@
 #include <geometry_msgs/WrenchStamped.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Float32.h>
+#include <sun_ros_msgs/Float64Stamped.h>
 #include "std_srvs/SetBool.h"
 
 /* ======= COLORS ========= */
@@ -63,7 +64,7 @@ double control_gain;
 double stiff_1;
 double stiff_2;
 bool b_linear_model;
-std_msgs::Float32 velMsg;
+sun_ros_msgs::Float64Stamped velMsg;
 
 double inv_stiff(double f){
     if(b_linear_model){
@@ -78,6 +79,7 @@ void applyControl(){
     double dx_r = inv_stiff(fr);
     velMsg.data = -control_gain*(dx_r-fabs(dx));
     velMsg.data = velMsg.data*1.0E3; // m/s  to mm/s
+    velMsg.header.stamp = ros::Time::now();
     velPub.publish(velMsg);
 }
 
@@ -93,8 +95,12 @@ void readForceFloat64(const std_msgs::Float64::ConstPtr& forceMsg){
 	fz = forceMsg->data;
 	applyControl();
 }
+void readForceFloat64Stamped(const sun_ros_msgs::Float64Stamped::ConstPtr& forceMsg){
+	fz = forceMsg->data;
+	applyControl();
+}
 
-void readCommand(const std_msgs::Float64::ConstPtr& forceMsg){
+void readCommand(const sun_ros_msgs::Float64Stamped::ConstPtr& forceMsg){
 
 	fr = fabs(forceMsg->data);
     //saturation
@@ -122,6 +128,11 @@ void startSubscribers(){
     {
         case str2int("Float64"):{
             force_sub = nh_public->subscribe(topic_measure_str, 1, readForceFloat64);
+            break;
+        }
+
+        case str2int("Float64Stamped"):{
+            force_sub = nh_public->subscribe(topic_measure_str, 1, readForceFloat64Stamped);
             break;
         }
 
@@ -182,7 +193,7 @@ int main(int argc, char *argv[]){
     ros::NodeHandle nh_private("~");
 	 
     nh_private.param("topic_measure" , topic_measure_str, string("grasp_force") );
-    nh_private.param("topic_measure_type" , topic_measure_type_str, string("Float64") );
+    nh_private.param("topic_measure_type" , topic_measure_type_str, string("Float64Stamped") );
     
     nh_private.param("topic_force_command" , topic_force_command_str, string("command_force") );
 	string topic_goal_speed("");
@@ -202,7 +213,7 @@ int main(int argc, char *argv[]){
      if(running){
         startSubscribers();
      }
-	 velPub = nh_public->advertise<std_msgs::Float32>( topic_goal_speed,1);
+	 velPub = nh_public->advertise<sun_ros_msgs::Float64Stamped>( topic_goal_speed,1);
 
     ros::ServiceServer servicePause = nh_public->advertiseService(set_running_service_str, setRunning_callbk);
 

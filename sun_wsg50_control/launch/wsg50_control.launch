@@ -12,7 +12,7 @@
 
 
 	<arg name="measure_topic" default="grasp_force" />
-	<arg name="measure_topic_type" default="Float64" />
+	<arg name="measure_topic_type" default="Float64Stamped" />
 
 	<arg name="force_command_topic" default="command_force" />
 	<arg name="width_topic" default="width" />
@@ -77,7 +77,7 @@
 	</node>
 
 
-	<node name="filter_control" pkg="sun_utils" type="filter_float32" if="$(arg filter_control)" output="screen">
+	<node name="filter_control" pkg="sun_ros_utils_nodes" type="filter_float64_stamped" if="$(arg filter_control)" output="screen">
 
 		<param name="in_topic" type="string" value="$(arg goal_speed_topic)/raw" />
 

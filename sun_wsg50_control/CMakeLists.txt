@@ -10,6 +10,7 @@ project(sun_wsg50_control)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sun_wsg50_common
+  sun_ros_msgs
 )
 
 ## System dependencies are found with CMake's conventions

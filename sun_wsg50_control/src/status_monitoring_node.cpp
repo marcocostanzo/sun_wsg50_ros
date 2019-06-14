@@ -20,8 +20,7 @@
 */
 
 #include "ros/ros.h"
-#include "std_msgs/Float32.h"
-#include "std_msgs/Float64.h"
+#include "sun_ros_msgs/Float64Stamped.h"
 
 using namespace std;
 
@@ -31,15 +30,15 @@ ros::Publisher pub_speed;
 //Global Vars
 double width_min, width_max, width;
 
-void width_cb(const std_msgs::Float64::ConstPtr& width_msg)
+void width_cb(const sun_ros_msgs::Float64Stamped::ConstPtr& width_msg)
 {
     width = width_msg->data;
 }
 
-void monitor_cb(const std_msgs::Float32::ConstPtr& speed_in)
+void monitor_cb(const sun_ros_msgs::Float64Stamped::ConstPtr& speed_in)
 {
 
-    std_msgs::Float32 speed_out;
+    sun_ros_msgs::Float64Stamped speed_out;
     if( (width >= width_max && speed_in->data > 0.0) || (width <= width_min && speed_in->data < 0.0) ){
         speed_out.data = 0.0;
         ROS_WARN_THROTTLE( 10 ,"GRIPPER MONITORING: INVALID WIDTH");
@@ -54,6 +53,7 @@ void monitor_cb(const std_msgs::Float32::ConstPtr& speed_in)
         speed_out.data = 0.0;
     }
 
+    speed_out.header = speed_in->header;
     pub_speed.publish(speed_out);
 
 }
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     nh_private.param("topic_width" , topic_width, string("width") );
 
     //Pub/Sub
-    pub_speed = nh_public.advertise<std_msgs::Float32>(topic_goal_speed_out, 1);
+    pub_speed = nh_public.advertise<sun_ros_msgs::Float64Stamped>(topic_goal_speed_out, 1);
     ros::Subscriber sub_width = nh_public.subscribe(topic_width, 1, width_cb);
     ros::Subscriber sub_speed = nh_public.subscribe(topic_goal_speed_in, 1, monitor_cb);
 
