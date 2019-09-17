@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   
-  <xacro:macro name="wsg50" params="parent hardware_interface robot_name *origin">
+  <xacro:macro name="wsg50" params="parent hardware_interface robot_name *origin scale finger_file fingerpx fingerpy fingerpz fingeror fingerop fingeroy ee_link_z">
     
     <!--joint between {parent} and gripper_roll_link-->
     <joint name="${parent}_${robot_name}_joint" type="fixed">
@@ -20,7 +20,7 @@
       <visual>
           <origin xyz="0.0 0 0" rpy="0 0 0" />
           <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/WSG50_110.stl" scale="1 1 1"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/WSG50_110.stl" scale="${scale*1} ${scale*1} ${scale*1}"/>
           </geometry>
           <material name="grey">
 				<color rgba="0.5 0.5 0.5 1"/>
@@ -30,7 +30,7 @@
       <collision>
           <origin xyz="0.0 0 0" rpy="0 0 0" />
           <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/WSG50_110.stl" scale="1 1 1"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/WSG50_110.stl" scale="${scale*1} ${scale*1} ${scale*1}"/>
          </geometry>
      </collision>
   </link>
@@ -45,14 +45,14 @@
     <visual>
           <origin xyz="0.0 0 0.0" rpy="0 0 0" />
       <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
       </geometry>
       <material name="black"/>
     </visual>
     <collision>
           <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
       </geometry>
     </collision>
       <inertial>
@@ -69,12 +69,12 @@
     <child link="finger_link1"/>
     <origin xyz="0 0 0"/>
     <axis xyz="1 0 0"/>
-     <limit lower="-0.055" upper="-0.0027" effort="1.0" velocity="1.0"/>
+     <limit lower="${-0.055*scale}" upper="${-0.0027*scale}" effort="1.0" velocity="1.0"/>
     <dynamics damping="50" friction="1"/>
 </joint>
 
   <joint name="guide_joint_finger_left" type="fixed">
-     <origin xyz="0 0 0.023" rpy="0 0 0" />
+     <origin xyz="0 0 ${0.023*scale}" rpy="0 0 0" />
      <parent link="finger_link1"/>
      <child link="finger_left" />
      <dynamics friction="100" damping="100" />
@@ -84,19 +84,18 @@
 
   <link name="finger_left">
       <visual>
-          <origin xyz="0.0 0 0.0" rpy="0 0 0" />
+          <origin xyz="${fingerpx*scale} ${fingerpy*scale} ${fingerpz*scale}" rpy="${fingeror} ${fingerop} ${fingeroy}" />
           <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/WSG-FMF.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/${finger_file}" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
           </geometry>
-          <material name="black">
-		<color rgba="0 0 0 0"/>
+          <material name="White">
       	  </material>
       </visual>
 
       <collision>
-          <origin xyz="0 0 0" rpy="0 0 0" />
+          <origin xyz="${fingerpx*scale} ${fingerpy*scale} ${fingerpz*scale}" rpy="${fingeror} ${fingerop} ${fingeroy}" />
           <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/WSG-FMF.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/${finger_file}" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
          </geometry>
      </collision>
   </link>
@@ -110,14 +109,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.0"/> 
       <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
       </geometry>
       <material name="black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.0"/> 
       <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
       </geometry>
       <material name="orange"/>
     </collision>
@@ -128,7 +127,7 @@
   </link>
 
   <joint name="finger_joint2" type="prismatic">
-     <limit lower="0.0027" upper="0.055" effort="1.0" velocity="1.0"/>
+     <limit lower="${0.0027*scale}" upper="${0.055*scale}" effort="1.0" velocity="1.0"/>
      <origin xyz="0 0 0" rpy="0 0 3.14159" />
      <parent link="gripper_roll_link"/>
      <child link="finger_link2" />
@@ -138,7 +137,7 @@
   </joint>
 
   <joint name="guide_joint_finger_right" type="fixed">
-     <origin xyz="0 0 0.023" rpy="0 0 0" />
+     <origin xyz="0 0 ${0.023*scale}" rpy="0 0 0" />
      <parent link="finger_link2"/>
      <child link="finger_right" />
      <dynamics friction="100" damping="100" />
@@ -148,19 +147,18 @@
 
   <link name="finger_right">
       <visual>
-          <origin xyz="0.0 0 0" rpy="0 0 0" />
+          <origin xyz="${fingerpx*scale} ${fingerpy*scale} ${fingerpz*scale}" rpy="${fingeror} ${fingerop} ${fingeroy}" />
           <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/WSG-FMF.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/${finger_file}" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
           </geometry>
-          <material name="black">
-		<color rgba="0 0 0 0"/>
+          <material name="White">
       	  </material>
       </visual>
 
       <collision>
-          <origin xyz="0 0 0" rpy="0 0 0" />
+          <origin xyz="${fingerpx*scale} ${fingerpy*scale} ${fingerpz*scale}" rpy="${fingeror} ${fingerop} ${fingeroy}" />
           <geometry>
-             <mesh filename="package://sun_wsg50_simulation/meshes/WSG-FMF.stl" scale="0.001 0.001 0.001"/>
+             <mesh filename="package://sun_wsg50_simulation/meshes/${finger_file}" scale="${scale*0.001} ${scale*0.001} ${scale*0.001}"/>
          </geometry>
      </collision>
   </link>-->
@@ -171,7 +169,7 @@
     <joint name="${robot_name}_joint_ee" type="fixed">
       <parent link="gripper_roll_link"/>
       <child link="${robot_name}_link_ee"/>
-      <origin rpy="0 -1.57 0" xyz="0 0 0.22"/>
+      <origin rpy="0 -1.57 0" xyz="0 0 ${ee_link_z*scale}"/>
     </joint>
 
   </xacro:macro>

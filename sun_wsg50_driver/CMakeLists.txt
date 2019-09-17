@@ -73,6 +73,16 @@ add_executable(wsg_50_ip_sun src/main.cpp ${DRIVER_SOURCES})
 target_link_libraries(wsg_50_ip_sun ${catkin_LIBRARIES})
 add_dependencies(wsg_50_ip_sun wsg_50_common_gencpp)
 
+#########################################
+add_executable(joint_state_splitter
+  src/joint_state_splitter_node.cpp
+)
+add_dependencies(joint_state_splitter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(joint_state_splitter
+  ${catkin_LIBRARIES}
+)
+#########################################
+
 #add_executable(wsg_50_can src/main_can.cpp src/checksum.cpp src/msg.c src/common.cpp src/functions_can.cpp)
 #add_executable(wsg_50_can src/main_can.cpp ${DRIVER_SOURCES_CAN})
 

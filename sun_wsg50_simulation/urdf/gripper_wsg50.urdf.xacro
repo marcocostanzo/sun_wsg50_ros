@@ -8,7 +8,7 @@
   <xacro:arg name="hardware_interface" default="PositionJointInterface"/>
   <xacro:arg name="robot_name" default="gripper"/>
   <xacro:arg name="origin_xyz" default="0 0 0.851"/>
-  <xacro:arg name="origin_rpy" default="0 0 0"/>
+  <xacro:arg name="origin_rpy" default="-1.5707 0 0"/>
   
   <material name="workcell">
     <color rgba="0.8 1.0 0.8 0.2"/>
@@ -19,8 +19,38 @@
   </link>
   
   <!--iiwa-->
-  <xacro:wsg50 hardware_interface="$(arg hardware_interface)" robot_name="$(arg robot_name)" parent="world">
+  <xacro:wsg50 
+    hardware_interface="$(arg hardware_interface)" 
+    robot_name="$(arg robot_name)" 
+    parent="world" 
+    scale="15.0" 
+    finger_file="case_v2.stl"
+    fingerpx="-0.065"
+    fingerpy="-0.045"
+    fingerpz="0.06"
+    fingeror="1.5707"
+    fingerop="0.0"
+    fingeroy="1.5707"
+    ee_link_z="0.195"
+    >
     <origin xyz="$(arg origin_xyz)" rpy="$(arg origin_rpy)" />
   </xacro:wsg50>
+
+  <!--xacro:wsg50 
+    hardware_interface="$(arg hardware_interface)" 
+    robot_name="$(arg robot_name)" 
+    parent="world" 
+    scale="15.0" 
+    finger_file="WSG-FMF.stl"
+    fingerpx="0.0"
+    fingerpy="0.0"
+    fingerpz="0.0"
+    fingeror="0.0"
+    fingerop="0.0"
+    fingeroy="0.0"
+    ee_link_z="0.195"
+    >
+    <origin xyz="$(arg origin_xyz)" rpy="$(arg origin_rpy)" />
+  </xacro:wsg50-->
   
 </robot>
