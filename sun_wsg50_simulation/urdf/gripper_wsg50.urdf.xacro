@@ -7,7 +7,7 @@
   
   <xacro:arg name="hardware_interface" default="PositionJointInterface"/>
   <xacro:arg name="robot_name" default="gripper"/>
-  <xacro:arg name="origin_xyz" default="0 0 0.851"/>
+  <xacro:arg name="origin_xyz" default="0 0 5.0"/>
   <xacro:arg name="origin_rpy" default="-1.5707 0 0"/>
   
   <material name="workcell">
