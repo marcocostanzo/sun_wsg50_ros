@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:property name="finger_joint_limit_lower" value="0.0"/>
+<xacro:property name="finger_joint_limit_upper" value="0.110"/>
+
+<!-- macro for finger flange -->
+<xacro:macro 
+    name="wsg50_finger_flange" 
+    params="
+        link_name:=finger_link
+        scale:=1.0
+        "
+>
+
+<xacro:property name="wsg50_finger_flange_cad_file" value="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl"/>
+<xacro:property name="cad_scale" value="0.001"/>
+<xacro:property name="local_scale" value="${cad_scale*scale}"/>
+<xacro:property name="wsg50_finger_flange_mesh">
+    <mesh 
+        filename="${wsg50_finger_flange_cad_file}" 
+        scale="${local_scale} ${local_scale} ${local_scale}"
+    />
+</xacro:property>
+<xacro:property name="wsg50_finger_flange_mesh_origin">
+    <origin xyz="${0.0*local_scale} ${0.0*local_scale} ${0.0*local_scale}" rpy="${0.0} ${0.0} ${0.0}" />
+</xacro:property>
+
+<link name="${link_name}">
+    <visual>
+        <xacro:insert_block name="wsg50_finger_flange_mesh_origin" />
+        <geometry>
+            <xacro:insert_block name="wsg50_finger_flange_mesh" />
+        </geometry>
+    </visual>
+    <collision>
+        <xacro:insert_block name="wsg50_finger_flange_mesh_origin" />
+        <geometry>
+            <xacro:insert_block name="wsg50_finger_flange_mesh" />
+        </geometry>
+    </collision>
+</link>
+
+</xacro:macro>
+
+<!-- MACRO THAT IMPLEMENTS THE REAL SINGLE JOINT OF THE GRIPPER -->
+<xacro:macro 
+    name="wsg50_real_single_joint" 
+    params="
+        name_prefix:=''
+        name:=real_single_joint
+        parent_link_name:=gripper_roll_link
+        scale:=1.0
+        "
+>
+
+<joint name="${name_prefix}${name}" type="prismatic">
+    <parent link="${parent_link_name}"/>
+    <child link="${name_prefix}${name}_fake_link"/>
+    <limit lower="${finger_joint_limit_lower*scale}" upper="${finger_joint_limit_upper*scale}" effort="1.0" velocity="1.0"/>
+</joint>
+
+<link name="${name_prefix}${name}_fake_link">
+</link>
+
+</xacro:macro>
+
+<!-- macro for finger flange with joint -->
+<xacro:macro 
+    name="wsg50_finger_flange_with_joint" 
+    params="
+        name:=finger
+        parent_link_name:=gripper_roll_link
+        scale:=1.0
+        limit_sign:=-1.0
+        joint_to_mimic:=''
+        mimic_multipler:=0.5
+        *link_origin
+        *link_axis
+        "
+>
+
+<joint name="${name}_joint" type="prismatic">
+    <parent link="${parent_link_name}"/>
+    <child link="${name}_link"/>
+    <xacro:insert_block name="link_origin" />
+    <xacro:insert_block name="link_axis" />
+    <!--limit lower="${limit_sign*(1+0*0.055)*scale}" upper="${limit_sign*(0+0*0.0027)*scale}" effort="1.0" velocity="1.0"/-->
+    <limit lower="${limit_sign*(finger_joint_limit_lower/2)*scale}" upper="${limit_sign*(finger_joint_limit_upper/2)*scale}" effort="1.0" velocity="1.0"/>
+    <xacro:unless value="${joint_to_mimic==''}">
+        <mimic joint="${joint_to_mimic}" multiplier="${mimic_multipler}" offset="0" />
+    </xacro:unless>
+</joint>
+
+<xacro:wsg50_finger_flange 
+    link_name="${name}_link" 
+    scale="${scale}"
+/>
+
+</xacro:macro>
+
+</robot>
