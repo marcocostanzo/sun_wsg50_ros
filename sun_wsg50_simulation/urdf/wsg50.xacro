@@ -34,6 +34,9 @@
         <geometry>
             <xacro:insert_block name="wsg50_110_mesh" />
         </geometry>
+        <material name="gray">
+            <color rgba="0.5 0.5 0.5 1"/>
+        </material>
     </visual>
     <collision>
         <xacro:insert_block name="wsg50_110_mesh_origin" />

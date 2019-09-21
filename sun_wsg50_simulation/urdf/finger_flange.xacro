@@ -32,6 +32,9 @@
         <geometry>
             <xacro:insert_block name="wsg50_finger_flange_mesh" />
         </geometry>
+        <material name="black">
+            <color rgba="0 0 0 1"/>
+        </material>
     </visual>
     <collision>
         <xacro:insert_block name="wsg50_finger_flange_mesh_origin" />
