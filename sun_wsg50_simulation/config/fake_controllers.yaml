@@ -1,5 +1,0 @@
-controller_list:
-  - name: fake_gripper_wsg50_controller
-    joints:
-      - finger_joint1
-      - finger_joint2
