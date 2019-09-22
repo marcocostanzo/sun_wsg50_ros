@@ -50,11 +50,11 @@
 <xacro:if value="${mimic_joints}">
 <xacro:wsg50_real_single_joint 
     name_prefix=""
-    name="${name_prefix}real_single_joint"
+    name="${name_prefix}gripper_joint"
     parent_link_name="${name_prefix}${roll_link_name}"
     scale="${scale}"
 />
-<xacro:property name="joint_to_mimic" value="${name_prefix}real_single_joint"/>
+<xacro:property name="joint_to_mimic" value="${name_prefix}gripper_joint"/>
 </xacro:if>
 <xacro:unless value="${mimic_joints}">
 <xacro:property name="joint_to_mimic" value="''"/>
