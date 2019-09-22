@@ -4,102 +4,152 @@
 <xacro:property name="finger_joint_limit_lower" value="0.0"/>
 <xacro:property name="finger_joint_limit_upper" value="0.110"/>
 
-<!-- macro for finger flange -->
+<!--    
+    MACRO to generate finger flange (sensor port)
+    base_link = name of the link (default base_link)
+    scale = unit scale, 1.0 = [m] (default 1.0)
+    prefix = name to use prefix (default '')
+
+    the finger flange link will be ${prefix}${base_link}
+-->
 <xacro:macro 
     name="wsg50_finger_flange" 
     params="
-        link_name:=finger_link
+        base_link:=base_link
         scale:=1.0
+        prefix:=''
         "
 >
 
-<xacro:property name="wsg50_finger_flange_cad_file" value="package://sun_wsg50_simulation/meshes/GUIDE_WSG50_110.stl"/>
-<xacro:property name="cad_scale" value="0.001"/>
-<xacro:property name="local_scale" value="${cad_scale*scale}"/>
-<xacro:property name="wsg50_finger_flange_mesh">
-    <mesh 
-        filename="${wsg50_finger_flange_cad_file}" 
-        scale="${local_scale} ${local_scale} ${local_scale}"
-    />
-</xacro:property>
-<xacro:property name="wsg50_finger_flange_mesh_origin">
-    <origin xyz="${0.0*local_scale} ${0.0*local_scale} ${0.0*local_scale}" rpy="${0.0} ${0.0} ${0.0}" />
-</xacro:property>
+    <!-- cad_scale to convert from cad to [m] -->
+    <xacro:property name="cad_scale" value="0.001"/>
+    <!-- local_scale cad to input scale -->
+    <xacro:property name="local_scale" value="${cad_scale*scale}"/>
+    <!-- origin of mesh wrt link frame -->
+    <xacro:property name="wsg50_finger_flange_mesh_origin">
+        <origin 
+            xyz="${0.0*local_scale} ${0.0*local_scale} ${0.0*local_scale}" 
+            rpy="${0.0} ${0.0} ${0.0}" 
+        />
+    </xacro:property>
 
-<link name="${link_name}">
-    <visual>
-        <xacro:insert_block name="wsg50_finger_flange_mesh_origin" />
-        <geometry>
-            <xacro:insert_block name="wsg50_finger_flange_mesh" />
-        </geometry>
-        <material name="black">
-            <color rgba="0 0 0 1"/>
-        </material>
-    </visual>
-    <collision>
-        <xacro:insert_block name="wsg50_finger_flange_mesh_origin" />
-        <geometry>
-            <xacro:insert_block name="wsg50_finger_flange_mesh" />
-        </geometry>
-    </collision>
-</link>
+    <!-- finger flange link -->
+    <link name="${prefix}${base_link}">
+        <visual>
+            <xacro:insert_block name="wsg50_finger_flange_mesh_origin" />
+            <geometry>
+                <mesh 
+                    filename="package://sun_wsg50_simulation/meshes/visual/GUIDE_WSG50_110.stl" 
+                    scale="${local_scale} ${local_scale} ${local_scale}"
+                />
+            </geometry>
+            <material name="black">
+                <color rgba="0 0 0 1"/>
+            </material>
+        </visual>
+        <collision>
+            <xacro:insert_block name="wsg50_finger_flange_mesh_origin" />
+            <geometry>
+                <mesh 
+                    filename="package://sun_wsg50_simulation/meshes/collision/GUIDE_WSG50_110.stl" 
+                    scale="${local_scale} ${local_scale} ${local_scale}"
+                />
+            </geometry>
+        </collision>
+    </link>
 
-</xacro:macro>
+</xacro:macro> <!-- end macro finger flange link -->
 
-<!-- MACRO THAT IMPLEMENTS THE REAL SINGLE JOINT OF THE GRIPPER -->
-<xacro:macro 
-    name="wsg50_real_single_joint" 
-    params="
-        name_prefix:=''
-        name:=real_single_joint
-        parent_link_name:=gripper_roll_link
-        scale:=1.0
-        "
->
+<!--    
+    MACRO to generate finger flange (sensor port) with prismatic joint
+    prefix = name to use prefix (default '')
+    scale = unit scale, 1.0 = [m] (default 1.0)
+    joint_name = joint name for the prismatic joint (default finger_flange_joint)
+    parent_link = parent link to attach (default wsg50/base_link)
+    finger_flange_link = link name to use for the finger flange (sensor port) (default finger_flange_link)
+    joint_to_mimic = joint to mimic, if '' no mimic (default '')
+    mimic_multipler = multipler to use in mimic (default 0.5)
+    limit_sign = joint limit sign (you should not use di arg) (default 1.0)
+    *link_origin = origin tag for the prismatic joint
 
-<joint name="${name_prefix}${name}" type="prismatic">
-    <parent link="${parent_link_name}"/>
-    <child link="${name_prefix}${name}_fake_link"/>
-    <limit lower="${finger_joint_limit_lower*scale}" upper="${finger_joint_limit_upper*scale}" effort="1.0" velocity="1.0"/>
-</joint>
-
-<link name="${name_prefix}${name}_fake_link">
-</link>
-
-</xacro:macro>
-
-<!-- macro for finger flange with joint -->
+    the finger flange link will be ${prefix}${finger_flange_link}
+    the prismatic joint will be ${prefix}${joint_name}
+-->
 <xacro:macro 
     name="wsg50_finger_flange_with_joint" 
     params="
-        name:=finger
-        parent_link_name:=gripper_roll_link
+        prefix:=''
         scale:=1.0
-        limit_sign:=-1.0
+        joint_name:=finger_flange_joint
+        parent_link:=wsg50/base_link
+        finger_flange_link:=finger_flange_link
         joint_to_mimic:=''
         mimic_multipler:=0.5
+        limit_sign:=1.0
         *link_origin
-        *link_axis
         "
 >
 
-<joint name="${name}_joint" type="prismatic">
-    <parent link="${parent_link_name}"/>
-    <child link="${name}_link"/>
-    <xacro:insert_block name="link_origin" />
-    <xacro:insert_block name="link_axis" />
-    <!--limit lower="${limit_sign*(1+0*0.055)*scale}" upper="${limit_sign*(0+0*0.0027)*scale}" effort="1.0" velocity="1.0"/-->
-    <limit lower="${limit_sign*(finger_joint_limit_lower/2)*scale}" upper="${limit_sign*(finger_joint_limit_upper/2)*scale}" effort="1.0" velocity="1.0"/>
-    <xacro:unless value="${joint_to_mimic==''}">
-        <mimic joint="${joint_to_mimic}" multiplier="${mimic_multipler}" offset="0" />
-    </xacro:unless>
-</joint>
+    <!-- Prismatic joint -->
+    <joint name="${prefix}${joint_name}" type="prismatic">
+        <parent link="${parent_link}"/>
+        <child link="${prefix}${finger_flange_link}"/>
+        <xacro:insert_block name="link_origin" />
+        <axis xyz="-1 0 0"/>
+        <limit 
+            lower="${limit_sign*(finger_joint_limit_lower/2)*scale}" 
+            upper="${limit_sign*(finger_joint_limit_upper/2)*scale}" 
+            effort="1.0" velocity="1.0"
+        />
+        <xacro:unless value="${joint_to_mimic==''}">
+            <mimic joint="${joint_to_mimic}" multiplier="${mimic_multipler}" offset="0" />
+        </xacro:unless>
+    </joint>
 
-<xacro:wsg50_finger_flange 
-    link_name="${name}_link" 
-    scale="${scale}"
-/>
+    <!-- finger flange link -->
+    <xacro:wsg50_finger_flange 
+        base_link="${finger_flange_link}"
+        scale="${scale}"
+        prefix="${prefix}"
+    />
 
-</xacro:macro>
+</xacro:macro> <!-- end macro finger flange + prismatic joint -->
+
+<!-- MACRO THAT IMPLEMENTS THE REAL SINGLE JOINT OF THE GRIPPER -->
+<!--    
+    MACRO to generate a fake joint/link that represents the real 1DOF joint of wsg50
+    prefix = name to use prefix (default '')
+    scale = unit scale, 1.0 = [m] (default 1.0)
+    joint_name = joint name for the prismatic joint (default 1dof_joint)
+    parent_link = parent link to attach (default wsg50/base_link)
+
+    the prismatic joint will be ${prefix}${joint_name}
+    this fake joint is usefull with the arg joint_to_mimic of wsg50_finger_flange_with_joint
+-->
+<xacro:macro 
+    name="wsg50_1dof_joint" 
+    params="
+        prefix:=''
+        scale:=1.0
+        joint_name:=1dof_joint
+        parent_link:=wsg50/base_link
+        "
+>
+
+    <!-- Prismatic joint -->
+    <joint name="${prefix}${joint_name}" type="prismatic">
+        <parent link="${parent_link}"/>
+        <child link="${prefix}${joint_name}_fake_link"/>
+        <limit 
+            lower="${finger_joint_limit_lower*scale}" 
+            upper="${finger_joint_limit_upper*scale}" 
+            effort="1.0" velocity="1.0"
+        />
+    </joint>
+
+    <!-- fake link -->
+    <link name="${prefix}${joint_name}_fake_link"/>
+
+</xacro:macro> <!-- end macro 1dof_joint -->
 
 </robot>

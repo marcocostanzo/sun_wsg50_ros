@@ -1,89 +1,124 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<!-- Import finger flange macro -->
+<!-- Import finger flange macros -->
 <xacro:include filename="$(find sun_wsg50_simulation)/urdf/finger_flange.xacro" />
 
+<!--    
+    MACRO to generate wsg50 without fingers
+    prefix = name to use as prefix (default '')
+    scale = unit scale, 1.0 = [m] (default 1.0)
+    base_link = base link of the gripper (default base_link)
+    mimic_joints = if true, create a fake joint for the real 1dof joint of the gripper and ad mimic tag to the 2 prismatic joints (default true)
+    prefix_finger_left = prefix to use fot the left finger (default left/)
+    prefix_finger_left = prefix to use fot the left finger (default left/)
+    finger_flange_left_link = link name for the left finger flange (default finger_flange_link)
+    prefix_finger_right = prefix to use fot the right finger (default right/)
+    finger_flange_right_link = link name for the right finger flange (default finger_flange_link)
+
+    the gripper base link will be ${prefix}${base_link}
+    the two prismatic joints : ${prefix}${prefix_finger_left}finger_flange_joint and ${prefix}${prefix_finger_right}finger_flange_joint
+    if mimic_joints=true the fake 1dof joint will be ${prefix}1dof_joint
+-->
 <xacro:macro 
     name="wsg50" 
     params="
-        name_prefix:=''
-        roll_link_name:=gripper_roll_link 
-        finger_left_name:=finger_left
-        finger_right_name:=finger_right
+        prefix:=''
         scale:=1.0
+        base_link:=base_link
         mimic_joints:=true
+        prefix_finger_left:=left/
+        finger_flange_left_link:=finger_flange_link
+        prefix_finger_right:=right/
+        finger_flange_right_link:=finger_flange_link       
         "
 >
 
-<xacro:property name="wsg50_110_cad_file" value="package://sun_wsg50_simulation/meshes/WSG50_110.stl"/>
-<xacro:property name="cad_scale" value="1.0"/>
-<xacro:property name="local_scale" value="${cad_scale*scale}"/>
-<xacro:property name="wsg50_110_mesh">
-  <mesh 
-    filename="${wsg50_110_cad_file}" 
-    scale="${local_scale} ${local_scale} ${local_scale}"
-  />
-</xacro:property>
-<xacro:property name="wsg50_110_mesh_origin">
-  <origin xyz="${0.0*local_scale} ${0.0*local_scale} ${0.0*local_scale}" rpy="${0.0} ${0.0} ${0.0}" />
-</xacro:property>
+    <!-- cad_scale to convert from cad to [m] -->
+    <xacro:property name="cad_scale" value="1.0"/>
+    <!-- local_scale cad to input scale -->
+    <xacro:property name="local_scale" value="${cad_scale*scale}"/>
+    <!-- origin of mesh wrt link frame -->
+    <xacro:property name="wsg50_110_mesh_origin">
+        <origin 
+            xyz="${0.0*local_scale} ${0.0*local_scale} ${0.0*local_scale}" 
+            rpy="${0.0} ${0.0} ${0.0}" 
+        />
+    </xacro:property>
 
-<link name="${name_prefix}${roll_link_name}">
-    <visual>
-        <xacro:insert_block name="wsg50_110_mesh_origin" />
-        <geometry>
-            <xacro:insert_block name="wsg50_110_mesh" />
-        </geometry>
-        <material name="gray">
-            <color rgba="0.5 0.5 0.5 1"/>
-        </material>
-    </visual>
-    <collision>
-        <xacro:insert_block name="wsg50_110_mesh_origin" />
-        <geometry>
-            <xacro:insert_block name="wsg50_110_mesh" />
-        </geometry>
-    </collision>
-</link>
+    <!-- WSG50 base_link of the gripper -->
+    <link name="${prefix}${base_link}">
+        <visual>
+            <xacro:insert_block name="wsg50_110_mesh_origin" />
+            <geometry>
+                <mesh 
+                    filename="package://sun_wsg50_simulation/meshes/visual/WSG50_110.stl" 
+                    scale="${local_scale} ${local_scale} ${local_scale}"
+                />
+            </geometry>
+            <material name="gray">
+                <color rgba="0.5 0.5 0.5 1"/>
+            </material>
+        </visual>
+        <collision>
+            <xacro:insert_block name="wsg50_110_mesh_origin" />
+            <geometry>
+                <mesh 
+                    filename="package://sun_wsg50_simulation/meshes/collision/WSG50_110.stl" 
+                    scale="${local_scale} ${local_scale} ${local_scale}"
+                />
+            </geometry>
+        </collision>
+    </link> <!-- end wsg50 base link -->
 
-<xacro:if value="${mimic_joints}">
-<xacro:wsg50_real_single_joint 
-    name_prefix=""
-    name="${name_prefix}gripper_joint"
-    parent_link_name="${name_prefix}${roll_link_name}"
-    scale="${scale}"
-/>
-<xacro:property name="joint_to_mimic" value="${name_prefix}gripper_joint"/>
-</xacro:if>
-<xacro:unless value="${mimic_joints}">
-<xacro:property name="joint_to_mimic" value="''"/>
-</xacro:unless>
+    <!-- check if I must mimic the joints -->
+    <xacro:if value="${mimic_joints}">
+        <!-- mimic the joints -> create a fake 1dof joint -->
+        <xacro:wsg50_1dof_joint 
+            prefix="${prefix}"
+            scale="${scale}"
+            joint_name="1dof_joint"
+            parent_link="${prefix}${base_link}"            
+        />
+        <!-- prepare the property joint_to_mimic for finger flange macro -->
+        <xacro:property name="joint_to_mimic" value="${prefix}1dof_joint"/>
+    </xacro:if>
+    <xacro:unless value="${mimic_joints}">
+        <xacro:property name="joint_to_mimic" value="''"/>
+    </xacro:unless>
 
-<xacro:wsg50_finger_flange_with_joint 
-    name="${finger_left_name}" 
-    parent_link_name="${name_prefix}${roll_link_name}"
-    scale="${scale}"
-    limit_sign="1.0"
-    joint_to_mimic="${joint_to_mimic}"
-    mimic_multipler="0.5"
->
-<origin xyz="0 0 0" rpy="0 0 0.0"/>
-<axis xyz="-1 0 0"/>
-</xacro:wsg50_finger_flange_with_joint>
+    <!-- finger flange + link (left) -->
+        <!-- 
+            joint_name=default 
+            limit_sign=default
+            mimic_multipler=default
+        -->
+    <xacro:wsg50_finger_flange_with_joint 
+        prefix="${prefix}${prefix_finger_left}"
+        scale="${scale}"
+        parent_link="${prefix}${base_link}"
+        joint_to_mimic="${joint_to_mimic}" 
+        finger_flange_link="${finger_flange_left_link}" 
+    >
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:wsg50_finger_flange_with_joint>
 
-<xacro:wsg50_finger_flange_with_joint 
-    name="${finger_right_name}" 
-    parent_link_name="${name_prefix}${roll_link_name}"
-    scale="${scale}"
-    limit_sign="1.0"
-    joint_to_mimic="${joint_to_mimic}"
-    mimic_multipler="0.5"
->
-<origin xyz="0 0 0" rpy="0 0 ${pi}"/>
-<axis xyz="-1 0 0"/>
-</xacro:wsg50_finger_flange_with_joint>
+    <!-- finger flange + link (right) -->
+        <!-- 
+            joint_name=default 
+            limit_sign=default
+            mimic_multipler=default
+        -->
+    <xacro:wsg50_finger_flange_with_joint 
+        prefix="${prefix}${prefix_finger_right}"
+        scale="${scale}"
+        parent_link="${prefix}${base_link}"
+        joint_to_mimic="${joint_to_mimic}"
+        finger_flange_link="${finger_flange_right_link}" 
+    >
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+    </xacro:wsg50_finger_flange_with_joint>
 
-</xacro:macro>
+</xacro:macro> <!-- end macro wsg50 -->
 
 </robot>

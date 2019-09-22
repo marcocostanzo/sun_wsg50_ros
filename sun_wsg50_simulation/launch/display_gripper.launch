@@ -1,14 +1,8 @@
 <launch>
 
-  <arg name="scale" default="1.0" />
-  <arg name="mimic_joints" default="true" />
-
   <arg name="model" 
-    default="$(find sun_wsg50_simulation)/urdf/wsg50.urdf.xacro
-    scale:=$(arg scale)
-    mimic_joints:=$(arg mimic_joints)
-    "
-    />
+    default="$(find sun_wsg50_simulation)/urdf/wsg50.urdf.xacro"
+  />
   <arg name="gui" default="true" />
   <arg name="rvizconfig" default="$(find sun_wsg50_simulation)/rviz/display_gripper.rviz" />
 
