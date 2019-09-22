@@ -1,10 +1,15 @@
 <?xml version="1.0"?>
 <robot name="wsg50" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+  <xacro:arg name="scale" default="1.0"/>
+  <xacro:arg name="mimic_joints" default="true"/>
+
   <!-- Import finger macro -->
   <xacro:include filename="$(find sun_wsg50_simulation)/urdf/wsg50.xacro" />
   
-  <xacro:wsg50>
-  </xacro:wsg50>
+  <xacro:wsg50
+    scale="$(arg scale)"
+    mimic_joints="$(arg mimic_joints)"
+  />
 
 </robot>

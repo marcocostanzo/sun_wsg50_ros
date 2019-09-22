@@ -12,6 +12,7 @@
         finger_left_name:=finger_left
         finger_right_name:=finger_right
         scale:=1.0
+        mimic_joints:=true
         "
 >
 
@@ -46,19 +47,25 @@
     </collision>
 </link>
 
+<xacro:if value="${mimic_joints}">
 <xacro:wsg50_real_single_joint 
     name_prefix=""
     name="${name_prefix}real_single_joint"
     parent_link_name="${name_prefix}${roll_link_name}"
     scale="${scale}"
 />
+<xacro:property name="joint_to_mimic" value="${name_prefix}real_single_joint"/>
+</xacro:if>
+<xacro:unless value="${mimic_joints}">
+<xacro:property name="joint_to_mimic" value="''"/>
+</xacro:unless>
 
 <xacro:wsg50_finger_flange_with_joint 
     name="${finger_left_name}" 
     parent_link_name="${name_prefix}${roll_link_name}"
     scale="${scale}"
-    limit_sign="-1.0"
-    joint_to_mimic="${name_prefix}real_single_joint"
+    limit_sign="1.0"
+    joint_to_mimic="${joint_to_mimic}"
     mimic_multipler="0.5"
 >
 <origin xyz="0 0 0" rpy="0 0 0.0"/>
@@ -70,42 +77,12 @@
     parent_link_name="${name_prefix}${roll_link_name}"
     scale="${scale}"
     limit_sign="1.0"
-    joint_to_mimic="${name_prefix}real_single_joint"
+    joint_to_mimic="${joint_to_mimic}"
     mimic_multipler="0.5"
 >
 <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
 <axis xyz="-1 0 0"/>
 </xacro:wsg50_finger_flange_with_joint>
-
-<!--
-<xacro:property name="finger_cad_file" value="package://sun_tactile_simulation/meshes/sun_finger_v3.stl"/>
-<xacro:property name="cad_scale" value="0.001"/>
-<xacro:property name="local_scale" value="${cad_scale*scale}"/>
-<xacro:property name="finger_mesh">
-  <mesh 
-    filename="${finger_cad_file}" 
-    scale="${local_scale} ${local_scale} ${local_scale}"
-  />
-</xacro:property>
-<xacro:property name="mesh_origin">
-  <origin xyz="${-56.9550247192*local_scale} ${-45.514275551*local_scale} ${0.00445556640625*local_scale}" rpy="${pi/2.0} ${0.0} ${pi/2}" />
-</xacro:property>
-<link name="${link_name}">
-    <visual>
-        <xacro:insert_block name="mesh_origin" />
-        <geometry>
-            <xacro:insert_block name="finger_mesh" />
-        </geometry>
-    </visual>
-    <collision>
-        <xacro:insert_block name="mesh_origin" />
-        <geometry>
-            <xacro:insert_block name="finger_mesh" />
-         </geometry>
-     </collision>
-</link>
--->
-
 
 </xacro:macro>
 
