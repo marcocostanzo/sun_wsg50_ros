@@ -3,6 +3,7 @@
 	<arg name="gripper_ip" default="192.168.2.110" />
 	<arg name="gripper_port" default="1000" />
 	<arg name="local_port" default="1501" />
+	<arg name="joint_prefix" default="" />
 
 	<arg name="goal_speed_topic" default="goal_speed" />
 	<arg name="status_topic" default="status" />
@@ -48,6 +49,8 @@
 		<arg name="width_topic" default="$(arg width_topic)" />
 
 		<arg name="gripper_model" value="$(arg gripper_model)" />
+
+		<arg name="joint_prefix" value="$(arg joint_prefix)" />
    
 	</include>
 	

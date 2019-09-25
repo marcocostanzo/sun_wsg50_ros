@@ -93,6 +93,7 @@ int g_timer_cnt = 0;
 ros::Publisher g_pub_state, g_pub_joint, g_pub_moving, g_pub_distnce;//, pub_tact0, pub_tact1;
 bool g_ismoving = false, g_mode_script = false, g_mode_periodic = false, g_mode_polling = false;
 float g_goal_position = NAN, g_goal_speed = NAN, g_speed = 10.0;
+std::string joint_prefix;
    
 //------------------------------------------------------------------------
 // Unit testing
@@ -343,7 +344,7 @@ void timer_cb(const ros::TimerEvent& ev)
 	sensor_msgs::JointState joint_states;
 	joint_states.header.stamp = myTime; //ros::Time::now();;
 	joint_states.header.frame_id = "gripper_tool_frame";
-	joint_states.name.push_back("gripper_joint");
+	joint_states.name.push_back(joint_prefix+"gripper_joint");
 	joint_states.position.resize(1);
 
 	joint_states.position[0] = info.position/1000.0;
@@ -574,6 +575,7 @@ int main( int argc, char **argv )
 
    nh.param("ip", ip, std::string("192.168.1.20"));
    nh.param("port", port, 1000);
+   nh.param("joint_prefix", joint_prefix, std::string(""));
    nh.param("local_port", local_port, 1501);
    nh.param("protocol", protocol, std::string(""));
    nh.param("com_mode", com_mode, std::string(""));

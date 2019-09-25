@@ -120,7 +120,7 @@
     MACRO to generate a fake joint/link that represents the real 1DOF joint of wsg50
     prefix = name to use prefix (default '')
     scale = unit scale, 1.0 = [m] (default 1.0)
-    joint_name = joint name for the prismatic joint (default 1dof_joint)
+    joint_name = joint name for the prismatic joint (default gripper_joint)
     parent_link = parent link to attach (default wsg50/base_link)
 
     the prismatic joint will be ${prefix}${joint_name}
@@ -131,7 +131,7 @@
     params="
         prefix:=''
         scale:=1.0
-        joint_name:=1dof_joint
+        joint_name:=gripper_joint
         parent_link:=wsg50/base_link
         "
 >
