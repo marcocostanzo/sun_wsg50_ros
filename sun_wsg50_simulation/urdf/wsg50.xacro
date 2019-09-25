@@ -38,6 +38,7 @@
     <xacro:property name="cad_scale" value="1.0"/>
     <!-- local_scale cad to input scale -->
     <xacro:property name="local_scale" value="${cad_scale*scale}"/>
+    <xacro:property name="local_scale_collision" value="${0.001*scale}"/>
     <!-- origin of mesh wrt link frame -->
     <xacro:property name="wsg50_110_mesh_origin">
         <origin 
@@ -65,7 +66,7 @@
             <geometry>
                 <mesh 
                     filename="package://sun_wsg50_simulation/meshes/collision/WSG50_110.stl" 
-                    scale="${local_scale} ${local_scale} ${local_scale}"
+                    scale="${local_scale_collision} ${local_scale_collision} ${local_scale_collision}"
                 />
             </geometry>
         </collision>
