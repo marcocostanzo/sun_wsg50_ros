@@ -16,4 +16,7 @@
   <run_depend>robot_state_publisher</run_depend>
   <run_depend>xacro</run_depend>
 
+  <run_depend>sun_ros_msgs</run_depend>
+  <build_depend>sun_ros_msgs</build_depend>
+
 </package>
