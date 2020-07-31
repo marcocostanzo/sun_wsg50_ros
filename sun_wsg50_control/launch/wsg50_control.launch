@@ -18,7 +18,7 @@
 	<arg name="force_command_topic" default="command_force" />
 	<arg name="width_topic" default="width" />
 
-	<arg name="force_control_set_running_service" default="set_running" />
+	<arg name="force_control_set_running_service" default="force_control/set_running" />
 	<arg name="force_control_start_running" default="false" />
 
 	<arg name="control_gain" default="5.0" />
