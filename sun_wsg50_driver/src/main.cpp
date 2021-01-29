@@ -589,6 +589,8 @@ int main( int argc, char **argv )
    nh.param("homing_srv", homing_srv_str, string("homing"));
    string finger_distance_topic_str("");
    nh.param("width_topic", finger_distance_topic_str, string("width"));
+   string joint_states_topic_str("");
+   nh.param("joint_states_topic", joint_states_topic_str, string("joint_states"));
 
    if (protocol == "udp")
        use_udp = true;
@@ -642,7 +644,7 @@ int main( int argc, char **argv )
 
 		// Publisher
 		g_pub_state = nh_public.advertise<sun_wsg50_common::Status>(status_topic_str, 1);
-		g_pub_joint = nh_public.advertise<sensor_msgs::JointState>("/wsg_50_driver/joint_states", 10);
+		g_pub_joint = nh_public.advertise<sensor_msgs::JointState>(joint_states_topic_str, 10);
         g_pub_distnce = nh_public.advertise<sun_ros_msgs::Float64Stamped>(finger_distance_topic_str, 1);
         if (g_mode_script || g_mode_periodic)
             g_pub_moving = nh_public.advertise<std_msgs::Bool>("moving", 10);
