@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sun_wsg50_common
   sun_ros_msgs
+  sun_systems_lib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -214,5 +215,13 @@ add_executable(status_monitoring
 )
 add_dependencies(status_monitoring ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(status_monitoring
+  ${catkin_LIBRARIES}
+)
+####################################
+add_executable(force_reference_filt
+  src/force_reference_filt_node.cpp
+)
+add_dependencies(force_reference_filt ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(force_reference_filt
   ${catkin_LIBRARIES}
 )

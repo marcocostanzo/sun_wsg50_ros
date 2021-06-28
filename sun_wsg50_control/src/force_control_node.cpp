@@ -75,6 +75,17 @@ double inv_stiff(double f){
 }
 
 void applyControl(){
+    if(fabs(fz)>max_force)
+    {
+        if( fabs(fr) > fabs(fz))
+        {
+        velMsg.data = 0;
+        velMsg.header.stamp = ros::Time::now();
+        velPub.publish(velMsg);
+        return;
+        }
+    }
+
     double dx = inv_stiff(fz);
     double dx_r = inv_stiff(fr);
     velMsg.data = -control_gain*(dx_r-fabs(dx));
@@ -104,10 +115,10 @@ void readCommand(const sun_ros_msgs::Float64Stamped::ConstPtr& forceMsg){
 
 	fr = fabs(forceMsg->data);
     //saturation
-    if(fr>max_force){
-        fr = max_force;
-        //cout << HEADER_PRINT << BOLDRED << "MAX FORCE!" << max_force << CRESET << endl;
-    }
+    // if(fr>max_force){
+    //     fr = max_force;
+    //     //cout << HEADER_PRINT << BOLDRED << "MAX FORCE!" << max_force << CRESET << endl;
+    // }
 }
 
 void sendZeroVel(){

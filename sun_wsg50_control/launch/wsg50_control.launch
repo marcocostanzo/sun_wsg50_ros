@@ -53,6 +53,20 @@
 		<arg name="joint_prefix" value="$(arg joint_prefix)" />
    
 	</include>
+
+	<node name="force_reference_filt"  pkg="sun_wsg50_control" type="force_reference_filt" output="screen">
+
+		<param name="in_topic" type="string" value="$(arg force_command_topic)" />
+		<param name="measure_topic" type="string" value="$(arg measure_topic)" />
+
+		<param name="out_topic"  value="$(arg force_command_topic)/ok" />
+
+		<param name="cut_freq" value="50.0"/>
+		<param name="rate"  value="500.0"/>
+
+		<param name="max_force"  value="$(arg max_force)"/>
+
+	</node>
 	
 
 	<node name="force_control"  pkg="sun_wsg50_control" type="force_control" output="screen">
@@ -60,7 +74,7 @@
 		<param name="topic_measure" type="string" value="$(arg measure_topic)" />
 		<param name="topic_measure_type" type="string" value="$(arg measure_topic_type)" />
 
-		<param name="topic_force_command" type="string" value="$(arg force_command_topic)" />
+		<param name="topic_force_command" type="string" value="$(arg force_command_topic)/ok" />
 
 		<param name="topic_goal_speed" type="string" value="$(arg goal_speed_topic)/raw" if="$(arg filter_control)"/>
 		<param name="topic_goal_speed" type="string" value="$(arg goal_speed_topic)/unmonitored" unless="$(arg filter_control)"/>
@@ -71,7 +85,7 @@
 
 		<param name="control_gain" value="$(arg control_gain)"/>
 
-		<param name="max_force" value="$(arg max_force)"/>
+		<param name="max_force" value="$(eval 2.0 * arg('max_force') )"/>
 
 		<param name="stiff_1" value="$(arg stiff_1)"/>
 		<param name="stiff_2" value="$(arg stiff_2)"/>
