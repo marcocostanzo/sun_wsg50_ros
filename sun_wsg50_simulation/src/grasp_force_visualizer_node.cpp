@@ -44,6 +44,9 @@ int main( int argc, char** argv )
   std::string grasp_force_topic_str;
   nh_private.param( "grasp_force_topic", grasp_force_topic_str, std::string("grasp_force") );
 
+  double put_marker_down;
+  nh_private.param( "put_marker_down", put_marker_down, 1.0 );
+
   ros::Subscriber sub_grasp_force = n.subscribe(grasp_force_topic_str, 1, grasp_force_cb);
   
 
@@ -76,7 +79,7 @@ int main( int argc, char** argv )
 
     // Set the pose of the marker.  This is a full 6DOF pose relative to the frame/time specified in the header
     marker.pose.position.x = 0.0;//-(CIL_H*(1.0-grasp_force_n) )/2.0*scale;
-    marker.pose.position.y = ( 0.025 + (CIL_D/2.0) )*scale; //up
+    marker.pose.position.y = put_marker_down*( 0.025 + (CIL_D/2.0) )*scale; //up
     marker.pose.position.z = (0.07 - (CIL_D/2.0) )*scale; //to tcp
     marker.pose.orientation.x = 0.0;
     marker.pose.orientation.y = 0.7071068;
