@@ -39,6 +39,7 @@
   <buildtool_depend>catkin</buildtool_depend>  <!-- The export tag contains other, unspecified, tags -->
   <depend>sun_wsg50_common</depend>
   <depend>sun_ros_msgs</depend>
+  <depend>sun_systems_lib</depend>
 
   <export>
     <!-- Other tools can request additional information be placed here -->
