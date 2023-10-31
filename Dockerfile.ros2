@@ -35,6 +35,36 @@ repositories: \n\
 " > ../overlay.repos
 RUN vcs import ./ < ../overlay.repos
 
+# Clone sun_ros_msgs
+RUN echo "\
+repositories: \n\
+  sun_ros_msgs: \n\
+    type: git \n\
+    url: https://github.com/marcocostanzo/sun_ros_msgs.git \n\
+    version: master \n\
+" > ../overlay.repos
+RUN vcs import ./ < ../overlay.repos
+
+# Clone sun_systems_lib
+RUN echo "\
+repositories: \n\
+  sun_systems_lib: \n\
+    type: git \n\
+    url: https://github.com/marcocostanzo/sun_systems_lib.git \n\
+    version: master \n\
+" > ../overlay.repos
+RUN vcs import ./ < ../overlay.repos
+
+# Clone ros_toon
+RUN echo "\
+repositories: \n\
+  ros_toon: \n\
+    type: git \n\
+    url: https://github.com/marcocostanzo/ros_toon.git \n\
+    version: master \n\
+" > ../overlay.repos
+RUN vcs import ./ < ../overlay.repos
+
 ARG OVERLAY_WS_ROS1
 WORKDIR $OVERLAY_WS_ROS1/src
 
