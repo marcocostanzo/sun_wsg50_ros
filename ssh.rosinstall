@@ -4,8 +4,4 @@
     uri: git@github.com:marcocostanzo/sun_ros_msgs.git
     version: master
 
-- git:
-    local-name: sun_wsg50_ros
-    uri: git@github.com:marcocostanzo/sun_wsg50_ros.git
-    version: master
     

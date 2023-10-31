@@ -1,0 +1,67 @@
+ARG FROM_IMAGE=ros:foxy-ros1-bridge
+ARG OVERLAY_WS_ROS1=/home/yaskawa_ws
+
+
+FROM $FROM_IMAGE 
+ARG OVERLAY_WS_ROS1
+WORKDIR $OVERLAY_WS_ROS1/src
+
+
+# Usefull packages
+RUN apt update -y \
+    && apt upgrade -y \
+    && apt install -y \
+    python3-pip \
+    git \
+    python3-catkin-tools \ 
+    ros-noetic-catkin \
+    libblas-dev \ 
+    liblapack-dev \ 
+    && pip install vcstool \
+    && apt-get install -y ros-noetic-ros-control ros-noetic-ros-controllers \
+    && apt-get install -y ros-noetic-nodelet-core
+    
+################# Clone required repositories ######################
+ARG OVERLAY_WS_ROS1
+WORKDIR $OVERLAY_WS_ROS1/src
+
+# Clone sun_yaskawa_ros
+RUN echo "\
+repositories: \n\
+  uclv_wsg50_ros: \n\
+    type: git \n\
+    url: https://github.com/sara9915/uclv_wsg50_ros.git \n\
+    version: main \n\
+" > ../overlay.repos
+RUN vcs import ./ < ../overlay.repos
+
+ARG OVERLAY_WS_ROS1
+WORKDIR $OVERLAY_WS_ROS1/src
+
+
+######################################################
+# copy manifests for caching
+WORKDIR /opt
+RUN mkdir -p /tmp/opt && \
+    find ./ -name "package.xml" | \
+      xargs cp --parents -t /tmp/opt && \
+    find ./ -name "CATKIN_IGNORE" | \
+      xargs cp --parents -t /tmp/opt || true
+
+
+# install overlay dependencies
+ARG OVERLAY_WS_ROS1
+WORKDIR $OVERLAY_WS_ROS1
+RUN . /opt/ros/$ROS1_DISTRO/setup.sh && \
+    apt-get update && rosdep install --from-paths src --ignore-src -r -y \
+    && rm -rf /var/lib/apt/lists/* 
+
+# build overlay source
+RUN . /opt/ros/$ROS1_DISTRO/setup.sh && \
+    catkin build 
+
+RUN echo "source devel/setup.bash" >> ~/.bashrc
+
+
+
+
