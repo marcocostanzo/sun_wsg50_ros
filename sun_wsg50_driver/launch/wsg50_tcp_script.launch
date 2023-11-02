@@ -9,6 +9,7 @@
   <arg name="status_topic" default="status" />
   <arg name="homing_srv" default="homing" />
   <arg name="width_topic" default="width" />
+  <arg name="joint_states_topic" default="/wsg/joint_states" />
 
   <arg name="gripper_model" default="wsg50" />
 
@@ -34,6 +35,8 @@
     <param name="homing_srv" type="string" value="$(arg homing_srv)"/>
 
     <param name="width_topic" type="string" value="$(arg width_topic)"/>
+
+    <param name="joint_states_topic" type="string" value="$(arg joint_states_topic)"/>
 
     <param name="joint_prefix" type="string" value="$(arg joint_prefix)"/>
 
