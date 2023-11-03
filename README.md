@@ -1,5 +1,3 @@
-# sun_wsg50_ros
-
 # WSG50/32 for ROS1
 
 ## Description
