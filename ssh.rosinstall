@@ -5,7 +5,13 @@
     version: master
 
 - git:
-    local-name: sun_wsg50_ros
-    uri: git@github.com:marcocostanzo/sun_wsg50_ros.git
+    local-name: sun_systems_lib
+    uri: git@github.com:marcocostanzo/sun_systems_lib.git
     version: master
+
+- git:
+    local-name: ros_toon
+    uri: git@github.com:marcocostanzo/ros_toon.git
+    version: master
+
     
