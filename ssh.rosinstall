@@ -4,4 +4,14 @@
     uri: git@github.com:marcocostanzo/sun_ros_msgs.git
     version: master
 
+- git:
+    local-name: sun_systems_lib
+    uri: git@github.com:marcocostanzo/sun_systems_lib.git
+    version: master
+
+- git:
+    local-name: ros_toon
+    uri: git@github.com:marcocostanzo/ros_toon.git
+    version: master
+
     
